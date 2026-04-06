@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Disc Golf Rating Calc</title>
+  <meta name="theme-color" content="#121212" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Rating Calc" />
+  <meta name="description" content="Disc golf target score calculator for PDGA/UDisc style rating conversions." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --input: #2a2a2a;
+      --line: #333;
+      --text: #e0e0e0;
+      --muted: #999;
+      --soft: #888;
+      --green: #4caf50;
+      --green-dark: #45a049;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)) 16px;
+      margin: 0;
+    }
+    .app-container {
+      background: var(--card);
+      padding: 22px;
+      border-radius: 22px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      border: 1px solid #242424;
+    }
+    h1 {
+      color: var(--green);
+      font-size: 1.55rem;
+      text-align: center;
+      margin: 0 0 20px;
+    }
+    .section-label {
+      color: var(--green);
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 20px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      margin-left: 4px;
+    }
+    input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--input);
+      color: white;
+      font-size: 1.08rem;
+      outline: none;
+    }
+    input:focus { border-color: var(--green); }
+    button {
+      width: 100%;
+      padding: 18px;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 1.08rem;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.1s ease;
+      margin-top: 8px;
+    }
+    button:active {
+      transform: scale(0.98);
+      background: var(--green-dark);
+    }
+    #result {
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--input);
+      border-radius: 16px;
+      display: none;
+      border: 1px solid var(--green);
+    }
+    .res-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 10px 0;
+      font-size: 1.05rem;
+      align-items: center;
+    }
+    .val {
+      color: var(--green);
+      font-weight: 800;
+      font-size: 1.6rem;
+      white-space: nowrap;
+    }
+    .sub-text {
+      font-size: 0.82rem;
+      color: var(--soft);
+      margin-top: -10px;
+      margin-bottom: 14px;
+      padding-left: 4px;
+      line-height: 1.4;
+    }
+    .footer-note {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: var(--soft);
+      text-align: center;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <h1>Rating Target Calc</h1>
+
+    <div class="section-label">Your Goal</div>
+    <label for="goalPDGA">Target PDGA SSA Rating</label>
+    <input type="number" id="goalPDGA" value="900" inputmode="numeric" />
+    <div class="sub-text">Typical: 850 (Rec), 900 (Int), 935 (Adv)</div>
+
+    <div class="section-label">Course Details</div>
+    <label for="curRate">Par Rating (UDisc Rating for Par)</label>
+    <input type="number" id="curRate" value="137" inputmode="decimal" />
+
+    <label for="holes">Total Holes</label>
+    <input type="number" id="holes" value="9" inputmode="numeric" />
+
+    <label for="par">Course Par</label>
+    <input type="number" id="par" value="31" inputmode="numeric" />
+
+    <button id="calcBtn" type="button">Calculate Score</button>
+
+    <div id="result" aria-live="polite">
+      <div style="text-align:center; color:#999; margin-bottom:15px; font-size:0.9rem;">
+        Target for <span id="displayGoal">900</span> SSA
+      </div>
+      <div class="res-row"><span>Target Score:</span><span id="tScore" class="val">--</span></div>
+      <div class="res-row"><span>Relative to Par:</span><span id="tPar" class="val">--</span></div>
+    </div>
+
+    <div class="footer-note">Installable on Android when hosted with HTTPS and added to your home screen.</div>
+  </div>
+
+  <script>
+    function calc() {
+      const goalPDGA = parseFloat(document.getElementById('goalPDGA').value);
+      const curUDisc = parseFloat(document.getElementById('curRate').value);
+      const h = parseInt(document.getElementById('holes').value);
+      const p = parseInt(document.getElementById('par').value);
+
+      if ([goalPDGA, curUDisc, h, p].some(v => Number.isNaN(v)) || h <= 0) {
+        alert('Please enter valid numbers.');
+        return;
+      }
+
+      const targetUDisc = (goalPDGA - 500) / 2;
+      const ptsPerStroke = (18 / h) * 10;
+      const ratingGap = targetUDisc - curUDisc;
+      const strokesNeeded = Math.round(ratingGap / ptsPerStroke);
+      const score = p - strokesNeeded;
+      const relative = score - p;
+
+      document.getElementById('displayGoal').innerText = goalPDGA;
+      document.getElementById('tScore').innerText = score;
+      document.getElementById('tPar').innerText = (relative > 0 ? '+' : '') + relative;
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('calcBtn').addEventListener('click', calc);
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
