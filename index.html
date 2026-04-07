@@ -56,8 +56,7 @@ button:active { transform: scale(0.98); background: #45a049; }
         <button class="secondary-btn" onclick="calcMyRating()">Calculate My Rating</button>
 
         <div id="scoreResult">
-            <div class="res-row"><span>UDisc SSA Rating:</span><span id="myUDisc" class="val">--</span></div>
-            <div class="res-row"><span>PDGA SSA Rating:</span><span id="myPDGA" class="val">--</span></div>
+            <div class="res-row"><span>Your SSA Rating:</span><span id="myPDGA" class="val">--</span></div>
             <div class="res-row"><span>Round vs Par:</span><span id="myPar" class="val">--</span></div>
         </div>
     </div>
@@ -115,11 +114,9 @@ function calcMyRating() {
     const ptsPerStroke = (18 / holes) * 10;
     const scoreVsPar = myScore - par;
 
-    // Better-than-par scores are negative, which should increase rating.
     const myUDisc = curUDisc - (scoreVsPar * ptsPerStroke);
     const myPDGA = myUDisc * 2 + 500;
 
-    document.getElementById('myUDisc').innerText = Math.round(myUDisc);
     document.getElementById('myPDGA').innerText = Math.round(myPDGA);
     document.getElementById('myPar').innerText = fmtPar(scoreVsPar);
     document.getElementById('scoreResult').style.display = 'block';
